@@ -18,6 +18,7 @@
 
         // Guardar el token JWT en el localStorage
         localStorage.setItem("token", response.data.access_token);
+        localStorage.setItem("role", response.data.role)
 
         // Redirigir a otra página (por ejemplo, Dashboard)
         window.location.href = "/dashboard";
