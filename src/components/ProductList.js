@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
-import Modal from "react-modal"; // Importamos react-modal
+import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 
 function ProductList() {
-    const [products, setProducts] = useState([]);
+    const [products, setProducts] = useState([]); // Inicializamos como array vacío
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
-    const [modalIsOpen, setModalIsOpen] = useState(false); // Para abrir/cerrar el modal
-    const [selectedProduct, setSelectedProduct] = useState(null); // Producto seleccionado para editar
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
     const [formData, setFormData] = useState({
         name: "",
         description: "",
-        price: "",
+        price: 0,
         category: "",
         brand: "",
         barcode: "",
@@ -39,7 +39,9 @@ function ProductList() {
                 },
             })
             .then((response) => {
-                setProducts(response.data.products);
+                // Aseguramos que siempre es un array, incluso si no se reciben datos
+                const productsData = response.data.products || [];
+                setProducts(productsData);
                 setLoading(false);
             })
             .catch((err) => {
@@ -49,11 +51,12 @@ function ProductList() {
     }, [token]);
 
     const openModal = (product = null) => {
+        // Si no hay producto seleccionado, formData será el formulario vacío
         setSelectedProduct(product);
         setFormData({
             name: product ? product.name : "",
             description: product ? product.description : "",
-            price: product ? product.price : "",
+            price: product ? product.price : 0,
             category: product ? product.category : "",
             brand: product ? product.brand : "",
             barcode: product ? product.barcode : "",
@@ -69,7 +72,7 @@ function ProductList() {
         setFormData({
             name: "",
             description: "",
-            price: "",
+            price: 0,
             category: "",
             brand: "",
             barcode: "",
@@ -106,14 +109,27 @@ function ProductList() {
                 });
         } else {
             // Crear producto
+            const productData = {
+                name: formData.name,
+                description: formData.description,
+                price: formData.price,
+                category: formData.category,
+                brand: formData.brand,
+                barcode: formData.barcode,
+                stock: formData.stock,
+                min_stock: formData.min_stock,
+            };
+
             axios
-                .post("http://127.0.0.1:8000/products", formData, {
+                .post("http://127.0.0.1:8000/products", productData, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 })
                 .then((response) => {
-                    setProducts([...products, response.data.product]);
+                    const newProduct = response.data.product;
+                    // Aseguramos que el nuevo producto sea agregado correctamente
+                    setProducts((prevProducts) => [...prevProducts, newProduct]);
                     closeModal();
                 })
                 .catch((err) => {
@@ -167,32 +183,38 @@ function ProductList() {
                 </tr>
                 </thead>
                 <tbody>
-                {products.map((product) => (
-                    <tr key={product.id} className="border-b hover:bg-gray-50">
-                        <td className="px-4 py-2">{product.name}</td>
-                        <td className="px-4 py-2">{product.description}</td>
-                        <td className="px-4 py-2">{product.price}</td>
-                        <td className="px-4 py-2">{product.category}</td>
-                        <td className="px-4 py-2 flex space-x-3">
-                            {role === "admin" && (
-                                <>
-                                    <button
-                                        onClick={() => openModal(product)}
-                                        className="text-blue-500 hover:text-blue-700"
-                                    >
-                                        <FaEdit className="text-xl" /> Editar
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(product.id)}
-                                        className="text-red-500 hover:text-red-700"
-                                    >
-                                        <FaTrashAlt className="text-xl" /> Eliminar
-                                    </button>
-                                </>
-                            )}
-                        </td>
+                {Array.isArray(products) && products.length > 0 ? (
+                    products.map((product) => (
+                        <tr key={product.id} className="border-b hover:bg-gray-50">
+                            <td className="px-4 py-2">{product.name || 'Nombre no disponible'}</td>
+                            <td className="px-4 py-2">{product.description || 'Descripción no disponible'}</td>
+                            <td className="px-4 py-2">{product.price || 'No disponible'}</td>
+                            <td className="px-4 py-2">{product.category || 'No disponible'}</td>
+                            <td className="px-4 py-2 flex space-x-3">
+                                {role === "admin" && (
+                                    <>
+                                        <button
+                                            onClick={() => openModal(product)}
+                                            className="text-blue-500 hover:text-blue-700"
+                                        >
+                                            <FaEdit className="text-xl" /> Editar
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(product.id)}
+                                            className="text-red-500 hover:text-red-700"
+                                        >
+                                            <FaTrashAlt className="text-xl" /> Eliminar
+                                        </button>
+                                    </>
+                                )}
+                            </td>
+                        </tr>
+                    ))
+                ) : (
+                    <tr>
+                        <td colSpan="5" className="text-center py-4">No hay productos disponibles</td>
                     </tr>
-                ))}
+                )}
                 </tbody>
             </table>
 
@@ -221,13 +243,18 @@ function ProductList() {
                         onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                         className="mb-4 p-2 w-full"
                     />
-                    <input
-                        type="text"
-                        placeholder="Categoría"
+                    <select
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                         className="mb-4 p-2 w-full"
-                    />
+                    >
+                        <option value="food">Comida</option>
+                        <option value="beverages">Bebidas</option>
+                        <option value="cleaning">Limpieza</option>
+                        <option value="personal_care">Cuidado Personal</option>
+                        <option value="home">Hogar</option>
+                        <option value="other">Otro</option>
+                    </select>
                     <input
                         type="text"
                         placeholder="Marca"
