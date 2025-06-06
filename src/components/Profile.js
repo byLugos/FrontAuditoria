@@ -41,32 +41,54 @@ function Profile() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 pt-20"> {/* Añadido padding-top para evitar la superposición */}
+        <div className="min-h-screen bg-gray-900 pt-20"> {/* Fondo oscuro para la página */}
             {/* Navbar */}
             <Navbar />
 
             {/* Contenido del perfil */}
-            <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-lg mt-6">
-                <h2 className="text-3xl font-bold text-center text-gray-700 mb-6">Información del Usuario</h2>
+            <div className="max-w-4xl mx-auto p-8 bg-white text-black rounded-lg shadow-lg mt-6"> {/* Fondo blanco y texto negro */}
+                <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Información del Usuario</h2>
 
                 {/* Botón de regreso al dashboard */}
-                <div className="text-center mb-6 mt-4">  {/* Agregamos mt-4 para el margen superior */}
+                <div className="text-center mb-6 mt-4">
                     <Link
                         to="/dashboard"
-                        className="text-white bg-indigo-600 px-6 py-2 rounded-lg hover:bg-indigo-700 transition duration-300"
+                        className="text-white bg-indigo-600 px-6 py-2 rounded-lg hover:bg-indigo-700 transition duration-300 shadow-md transform hover:scale-105"
                     >
                         Volver al Dashboard
                     </Link>
                 </div>
 
-                <div className="space-y-4">
-                    <p><strong>Nombre Completo:</strong> {user.full_name}</p>
-                    <p><strong>Correo electrónico:</strong> {user.email}</p>
-                    <p><strong>Usuario:</strong> {user.username}</p>
-                    <p><strong>Rol:</strong> {user.role}</p>
-                    <p><strong>Estado:</strong> {user.status}</p>
-                    <p><strong>Fecha de Creación:</strong> {new Date(user.created_at).toLocaleDateString()}</p>
-                    <p><strong>Último Inicio de Sesión:</strong> {new Date(user.last_login).toLocaleString()}</p>
+                {/* Información del usuario */}
+                <div className="space-y-6 text-black text-lg">
+                    <div className="flex justify-between">
+                        <p className="font-semibold">Nombre Completo:</p>
+                        <p>{user.full_name}</p>
+                    </div>
+                    <div className="flex justify-between">
+                        <p className="font-semibold">Correo electrónico:</p>
+                        <p>{user.email}</p>
+                    </div>
+                    <div className="flex justify-between">
+                        <p className="font-semibold">Usuario:</p>
+                        <p>{user.username}</p>
+                    </div>
+                    <div className="flex justify-between">
+                        <p className="font-semibold">Rol:</p>
+                        <p>{user.role}</p>
+                    </div>
+                    <div className="flex justify-between">
+                        <p className="font-semibold">Estado:</p>
+                        <p>{user.status}</p>
+                    </div>
+                    <div className="flex justify-between">
+                        <p className="font-semibold">Fecha de Creación:</p>
+                        <p>{new Date(user.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <div className="flex justify-between">
+                        <p className="font-semibold">Último Inicio de Sesión:</p>
+                        <p>{new Date(user.last_login).toLocaleString()}</p>
+                    </div>
                 </div>
             </div>
         </div>

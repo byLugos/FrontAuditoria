@@ -230,7 +230,21 @@ function ProductList() {
             </table>
 
             {/* Modal para Crear/Editar Producto */}
-            <Modal isOpen={modalIsOpen} onRequestClose={closeModal} contentLabel="Producto" className="modal">
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                contentLabel="Producto"
+                className="modal"
+                style={{
+                    content: {
+                        width: "500px",
+                        margin: "auto",
+                        padding: "20px",
+                        borderRadius: "10px",
+                        backgroundColor: "#fff",
+                    },
+                }}
+            >
                 <h2 className="text-2xl font-bold mb-4">{selectedProduct ? "Editar Producto" : "Crear Producto"}</h2>
                 <form onSubmit={handleSubmit}>
                     <input
@@ -302,7 +316,21 @@ function ProductList() {
             </Modal>
 
             {/* Modal de Detalles del Producto */}
-            <Modal isOpen={detailsModalIsOpen} onRequestClose={closeDetailsModal} contentLabel="Detalles Producto" className="modal">
+            <Modal
+                isOpen={detailsModalIsOpen}
+                onRequestClose={closeDetailsModal}
+                contentLabel="Detalles Producto"
+                className="modal"
+                style={{
+                    content: {
+                        width: "400px",
+                        margin: "auto",
+                        padding: "20px",
+                        borderRadius: "10px",
+                        backgroundColor: "#fff",
+                    },
+                }}
+            >
                 <h2 className="text-2xl font-bold mb-4">Detalles del Producto</h2>
                 {productDetails && (
                     <>
