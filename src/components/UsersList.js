@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrashAlt, FaInfoCircle } from "react-icons/fa";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import Modal from "react-modal";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -97,11 +97,11 @@ function UserList() {
     }
   };
 
-  // Estilos en línea
+  // Estilos en línea con colores más sobrios
   const tableStyle = {
     width: '100%',
     borderCollapse: 'collapse',
-    backgroundColor: 'white',
+    backgroundColor: '#f4f6f9', // Tono gris suave
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
     borderRadius: '8px',
   };
@@ -109,7 +109,7 @@ function UserList() {
   const thStyle = {
     padding: '12px',
     textAlign: 'left',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#3b4a68', // Azul oscuro
     color: 'white',
     fontWeight: 'bold',
   };
@@ -122,14 +122,15 @@ function UserList() {
 
   const buttonStyle = {
     padding: '8px 16px',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#3b4a68', // Azul oscuro
     color: 'white',
     cursor: 'pointer',
     borderRadius: '4px',
+    marginRight: '5px',
   };
 
   const buttonHoverStyle = {
-    backgroundColor: '#45a049',
+    backgroundColor: '#2d3b53', // Azul más oscuro para el hover
   };
 
   return (
@@ -162,7 +163,7 @@ function UserList() {
           </thead>
           <tbody>
           {users.map((user) => (
-              <tr key={user.id} style={{ borderBottom: '1px solid #ddd', backgroundColor: '#f9f9f9' }}>
+              <tr key={user.id} style={{ borderBottom: '1px solid #ddd', backgroundColor: '#ffffff' }}>
                 <td style={tdStyle}>{user.email}</td>
                 <td style={tdStyle}>{user.username}</td>
                 <td style={tdStyle}>{user.full_name}</td>
@@ -174,7 +175,7 @@ function UserList() {
                       <>
                         <button
                             onClick={() => openModal(user)}
-                            style={{ ...buttonStyle, marginRight: '10px' }}
+                            style={buttonStyle}
                             onMouseEnter={(e) => (e.target.style.backgroundColor = buttonHoverStyle.backgroundColor)}
                             onMouseLeave={(e) => (e.target.style.backgroundColor = buttonStyle.backgroundColor)}
                         >
@@ -251,7 +252,7 @@ function UserList() {
               <option value="active">Activo</option>
               <option value="inactive">Inactivo</option>
             </select>
-            <button type="submit" style={{ padding: '12px 24px', backgroundColor: '#4CAF50', color: 'white', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>
+            <button type="submit" style={{ padding: '12px 24px', backgroundColor: '#3b4a68', color: 'white', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>
               {selectedUser ? "Actualizar Usuario" : "Crear Usuario"}
             </button>
           </form>
