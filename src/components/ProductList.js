@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { FaEdit, FaTrashAlt, FaInfoCircle } from "react-icons/fa";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 
 function ProductList() {
-    const [products, setProducts] = useState([]); // Inicializamos como array vacío
+    const [products, setProducts] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -20,6 +20,8 @@ function ProductList() {
         stock: 0,
         min_stock: 0,
     });
+    const [detailsModalIsOpen, setDetailsModalIsOpen] = useState(false); // Para detalles
+    const [productDetails, setProductDetails] = useState(null); // Para almacenar los detalles del producto seleccionado
 
     const role = localStorage.getItem("role");
     const token = localStorage.getItem("token");
@@ -39,9 +41,7 @@ function ProductList() {
                 },
             })
             .then((response) => {
-                // Aseguramos que siempre es un array, incluso si no se reciben datos
-                const productsData = response.data.products || [];
-                setProducts(productsData);
+                setProducts(response.data.products);
                 setLoading(false);
             })
             .catch((err) => {
@@ -51,7 +51,6 @@ function ProductList() {
     }, [token]);
 
     const openModal = (product = null) => {
-        // Si no hay producto seleccionado, formData será el formulario vacío
         setSelectedProduct(product);
         setFormData({
             name: product ? product.name : "",
@@ -79,6 +78,16 @@ function ProductList() {
             stock: 0,
             min_stock: 0,
         });
+    };
+
+    const openDetailsModal = (product) => {
+        setProductDetails(product);
+        setDetailsModalIsOpen(true);
+    };
+
+    const closeDetailsModal = () => {
+        setDetailsModalIsOpen(false);
+        setProductDetails(null);
     };
 
     const handleSubmit = (e) => {
@@ -128,7 +137,6 @@ function ProductList() {
                 })
                 .then((response) => {
                     const newProduct = response.data.product;
-                    // Aseguramos que el nuevo producto sea agregado correctamente
                     setProducts((prevProducts) => [...prevProducts, newProduct]);
                     closeModal();
                 })
@@ -180,41 +188,44 @@ function ProductList() {
                     <th className="px-4 py-2">Precio</th>
                     <th className="px-4 py-2">Categoría</th>
                     <th className="px-4 py-2">Acciones</th>
+                    <th className="px-4 py-2">Detalles</th>
                 </tr>
                 </thead>
                 <tbody>
-                {Array.isArray(products) && products.length > 0 ? (
-                    products.map((product) => (
-                        <tr key={product.id} className="border-b hover:bg-gray-50">
-                            <td className="px-4 py-2">{product.name || 'Nombre no disponible'}</td>
-                            <td className="px-4 py-2">{product.description || 'Descripción no disponible'}</td>
-                            <td className="px-4 py-2">{product.price || 'No disponible'}</td>
-                            <td className="px-4 py-2">{product.category || 'No disponible'}</td>
-                            <td className="px-4 py-2 flex space-x-3">
-                                {role === "admin" && (
-                                    <>
-                                        <button
-                                            onClick={() => openModal(product)}
-                                            className="text-blue-500 hover:text-blue-700"
-                                        >
-                                            <FaEdit className="text-xl" /> Editar
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(product.id)}
-                                            className="text-red-500 hover:text-red-700"
-                                        >
-                                            <FaTrashAlt className="text-xl" /> Eliminar
-                                        </button>
-                                    </>
-                                )}
-                            </td>
-                        </tr>
-                    ))
-                ) : (
-                    <tr>
-                        <td colSpan="5" className="text-center py-4">No hay productos disponibles</td>
+                {products.map((product) => (
+                    <tr key={product.id} className="border-b hover:bg-gray-50">
+                        <td className="px-4 py-2">{product.name}</td>
+                        <td className="px-4 py-2">{product.description}</td>
+                        <td className="px-4 py-2">{product.price}</td>
+                        <td className="px-4 py-2">{product.category}</td>
+                        <td className="px-4 py-2 flex space-x-3">
+                            {role === "admin" && (
+                                <>
+                                    <button
+                                        onClick={() => openModal(product)}
+                                        className="text-blue-500 hover:text-blue-700"
+                                    >
+                                        <FaEdit className="text-xl" /> Editar
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(product.id)}
+                                        className="text-red-500 hover:text-red-700"
+                                    >
+                                        <FaTrashAlt className="text-xl" /> Eliminar
+                                    </button>
+                                </>
+                            )}
+                        </td>
+                        <td className="px-4 py-2">
+                            <button
+                                onClick={() => openDetailsModal(product)}
+                                className="text-green-500 hover:text-green-700"
+                            >
+                                <FaInfoCircle className="text-xl" /> Detalles
+                            </button>
+                        </td>
                     </tr>
-                )}
+                ))}
                 </tbody>
             </table>
 
@@ -288,6 +299,18 @@ function ProductList() {
                     </button>
                 </form>
                 <button onClick={closeModal} className="mt-4 text-gray-500">Cerrar</button>
+            </Modal>
+
+            {/* Modal de Detalles del Producto */}
+            <Modal isOpen={detailsModalIsOpen} onRequestClose={closeDetailsModal} contentLabel="Detalles Producto" className="modal">
+                <h2 className="text-2xl font-bold mb-4">Detalles del Producto</h2>
+                {productDetails && (
+                    <>
+                        <p><strong>Estado:</strong> {productDetails.status}</p>
+                        <p><strong>Fecha de Creación:</strong> {new Date(productDetails.created_at).toLocaleDateString()}</p>
+                    </>
+                )}
+                <button onClick={closeDetailsModal} className="mt-4 text-gray-500">Cerrar</button>
             </Modal>
         </div>
     );
